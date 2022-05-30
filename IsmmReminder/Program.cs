@@ -36,7 +36,18 @@ namespace IsmmReminder
             }
         }
 
-
+        private static Controller.Faults _faults = null;
+        public static Controller.Faults Faults
+        {
+            get
+            {
+                if(_faults==null)
+                {
+                    _faults = new Controller.Faults();
+                }
+                return _faults;
+            }
+        }
 
         /// <summary>
         /// The main entry point for the application.
