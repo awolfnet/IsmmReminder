@@ -15,8 +15,9 @@ namespace IsmmReminder.Forms
 {
     public partial class Browser : Form, Interface.IFaultsView
     {
-        public ChromiumWebBrowser mainBrowser;
-        private Faults _faults;
+        public ChromiumWebBrowser mainBrowser = null;
+        private Faults _faults = null;
+        private Dictionary<string, string> _cookies = null;
 
         public Browser()
         {
@@ -25,13 +26,24 @@ namespace IsmmReminder.Forms
             Cef.EnableHighDPISupport();
 
             mainBrowser = new ChromiumWebBrowser("https://ismm.sg/ce/faults");
+            mainBrowser.FrameLoadEnd += MainBrowser_FrameLoadEnd;
             this.Controls.Add(mainBrowser);
             mainBrowser.Dock = DockStyle.Fill;
         }
 
+        private void MainBrowser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
+        {
+            CookieVisitor visitor = new CookieVisitor();
+            visitor.SendCookie += _faults.SendCookie;
+            ICookieManager cookieManager = mainBrowser.GetCookieManager();
+            cookieManager.VisitAllCookies(visitor);
+        }
+
         private void Browser_Load(object sender, EventArgs e)
         {
-
+            SetController(Program.Faults);
+            _faults.SetView(this);
+            _cookies = new Dictionary<string, string>();
         }
 
 
@@ -52,8 +64,7 @@ namespace IsmmReminder.Forms
 
         private void menuMessage_Click(object sender, EventArgs e)
         {
-            Util.HTTP http = new Util.HTTP();
-            http.Request("");
+
         }
 
         private void startToolStripMenuItem_Click(object sender, EventArgs e)
@@ -73,7 +84,40 @@ namespace IsmmReminder.Forms
 
         private void menuStart_Click(object sender, EventArgs e)
         {
+            _faults.StartMonitor();
+        }
+        public class CookieVisitor : CefSharp.ICookieVisitor
+        {
+            public event Action<KeyValuePair<string, string>> SendCookie;
+            public void Dispose()
+            {
 
+            }
+
+            public bool Visit(Cookie cookie, int count, int total, ref bool deleteCookie)
+            {
+                deleteCookie = false;
+                SendCookie?.Invoke(new KeyValuePair<string, string>(cookie.Name, cookie.Value));
+                return true;
+            }
+
+
+
+        }
+
+        private void menuDebug_Click(object sender, EventArgs e)
+        {
+            mainBrowser.ShowDevTools();
+        }
+
+        public Dictionary<string, string> GetCookie()
+        {
+            return this._cookies;
+        }
+
+        private void menuFetch_Click(object sender, EventArgs e)
+        {
+            _faults.Fetch();
         }
     }
 }
