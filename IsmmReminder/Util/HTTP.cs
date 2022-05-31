@@ -13,10 +13,9 @@ namespace IsmmReminder.Util
     {
         public Dictionary<string, string> Cookies = null;
 
-        public string Request(string url)
+        public string Request(Uri uri)
         {
             string html = string.Empty;
-            Uri uri = new Uri(url);
 
             CookieContainer cookieContainer = null;
 
@@ -26,11 +25,11 @@ namespace IsmmReminder.Util
             if (Cookies != null)
             {
                 cookieContainer = new CookieContainer();
-                foreach(var cookie in Cookies)
+                foreach (var cookie in Cookies)
                 {
                     cookieContainer.Add(uri, new Cookie(cookie.Key, cookie.Value));
                 }
-                
+
                 request.CookieContainer = cookieContainer;
             }
 
@@ -43,6 +42,12 @@ namespace IsmmReminder.Util
             }
 
             return html;
+        }
+
+        public string Request(string url)
+        {
+            Uri uri = new Uri(url);
+            return Request(uri);
         }
     }
 }

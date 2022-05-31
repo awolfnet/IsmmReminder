@@ -92,6 +92,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -117,8 +118,11 @@
       <DependentUpon>Browser.cs</DependentUpon>
     </Compile>
     <Compile Include="Interface\IFaultsView.cs" />
+    <Compile Include="Model\FaultsOrder.cs" />
+    <Compile Include="Model\FaultsResponse.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\HTTP.cs" />
     <EmbeddedResource Include="Forms\ControlPanel.resx">
       <DependentUpon>ControlPanel.cs</DependentUpon>
