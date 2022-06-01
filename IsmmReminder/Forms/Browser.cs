@@ -13,7 +13,7 @@ using IsmmReminder.Controller;
 
 namespace IsmmReminder.Forms
 {
-    public partial class Browser : Form, Interface.IFaultsView
+    public partial class Browser : Form, Interface.IFaultsBrowserView
     {
         public ChromiumWebBrowser mainBrowser = null;
         private Faults _faults = null;
@@ -42,7 +42,7 @@ namespace IsmmReminder.Forms
         private void Browser_Load(object sender, EventArgs e)
         {
             SetController(Program.Faults);
-            _faults.SetView(this);
+            _faults.SetBrowserView(this);
             _cookies = new Dictionary<string, string>();
         }
 

@@ -13,7 +13,8 @@ namespace IsmmReminder.Controller
 {
     public class Faults
     {
-        private IFaultsView _view;
+        private IFaultsBrowserView _browserView;
+        private IFaultsDataView _dataView;
 
         private Timer _timer = null;
         private Dictionary<string, string> _cookies = null;
@@ -25,9 +26,14 @@ namespace IsmmReminder.Controller
             _cookies = new Dictionary<string, string>();
         }
 
-        public void SetView(IFaultsView View)
+        public void SetBrowserView(IFaultsBrowserView View)
         {
-            this._view = View;
+            this._browserView = View;
+        }
+
+        public void SetDataView(IFaultsDataView View)
+        {
+            _dataView = View;
         }
 
         public void StartMonitor()
@@ -61,6 +67,8 @@ namespace IsmmReminder.Controller
             query.Set("_", DateTime.UtcNow.ToUnixTimeSeconds().ToString());
             query.Set("sd", DateTime.UtcNow.AddMonths(-1).ToString("yyyy-MM-dd"));
             query.Set("ed", DateTime.UtcNow.ToString("yyyy-MM-dd"));
+            query.Set("start", "0");
+            query.Set("length", "482");
 
 
             string json = http.Request($"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}?{query}");
@@ -83,16 +91,16 @@ namespace IsmmReminder.Controller
                 FaultsOrder faultsOrder = new FaultsOrder()
                 {
                     fault_number = order.GetValue("fault_number").ToString(),
+                    created_at= order.GetValue("created_at").ToString(),
                     responded_date = order.GetValue("responded_date").ToString(),
                     site_visited_date = order.GetValue("site_visited_date").ToString(),
                     ra_acknowledged_date = order.GetValue("ra_acknowledged_date").ToString(),
                     work_started_date = order.GetValue("work_started_date").ToString(),
-                    work_completed_date = order.GetValue("work_completed_date").ToString(),
-                    user_acknowledge_date = order.GetValue("user_acknowledge_date").ToString()
+                    work_completed_date = order.GetValue("work_completed_date").ToString()
                 };
                 list.Add(faultsOrder);
             }
-            return;
+            _dataView.UpdateDatatable(list);
         }
 
         public void StopMonitor()

@@ -117,6 +117,7 @@
     <Compile Include="Forms\Browser.Designer.cs">
       <DependentUpon>Browser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interface\IFaultsDataView.cs" />
     <Compile Include="Interface\IFaultsView.cs" />
     <Compile Include="Model\FaultsOrder.cs" />
     <Compile Include="Model\FaultsResponse.cs" />
