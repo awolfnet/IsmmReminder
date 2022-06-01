@@ -49,6 +49,19 @@ namespace IsmmReminder
             }
         }
 
+        public static Forms.Message _message = null;
+        public static Forms.Message Message
+        {
+            get
+            {
+                if (_message == null || _message.IsDisposed)
+                {
+                    _message = new Forms.Message();
+                }
+                return _message;
+            }
+        }
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>

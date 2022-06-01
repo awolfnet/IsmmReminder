@@ -64,7 +64,7 @@ namespace IsmmReminder.Forms
 
         private void menuMessage_Click(object sender, EventArgs e)
         {
-
+            Program.Message.Show();
         }
 
         private void startToolStripMenuItem_Click(object sender, EventArgs e)
