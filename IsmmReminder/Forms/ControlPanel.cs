@@ -1,6 +1,7 @@
 ﻿using IsmmReminder.Controller;
 using IsmmReminder.Interface;
 using IsmmReminder.Model;
+using IsmmReminder.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,10 +46,10 @@ namespace IsmmReminder.Forms
 
         public void UpdateDatatable(List<FaultsOrder> orders)
         {
-            foreach(var order in orders)
+            foreach (var order in orders)
             {
 
-                dataGridView1.Rows.Add(new string[] { 
+                dataGridView1.Rows.Add(new string[] {
                     order.fault_number,
                     order.created_at,
                     order.responded_date,
@@ -58,12 +59,18 @@ namespace IsmmReminder.Forms
                     order.work_completed_date
                 });
             }
-            
+
         }
 
         public void Insert()
         {
             throw new NotImplementedException();
+        }
+
+        private void sendToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+
         }
     }
 }

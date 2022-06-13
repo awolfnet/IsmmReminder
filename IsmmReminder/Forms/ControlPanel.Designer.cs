@@ -101,7 +101,7 @@ namespace IsmmReminder.Forms
             // reloadToolStripMenuItem
             // 
             this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
-            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(168, 34);
+            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.reloadToolStripMenuItem.Text = "&Reload";
             // 
             // reminderToolStripMenuItem
@@ -117,6 +117,7 @@ namespace IsmmReminder.Forms
             this.sendToolStripMenuItem.Name = "sendToolStripMenuItem";
             this.sendToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.sendToolStripMenuItem.Text = "&Send";
+            this.sendToolStripMenuItem.Click += new System.EventHandler(this.sendToolStripMenuItem_Click);
             // 
             // ControlPanel
             // 

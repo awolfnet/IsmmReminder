@@ -123,13 +123,16 @@
     <Compile Include="Forms\Message.Designer.cs">
       <DependentUpon>Message.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interface\IFaultsDataView.cs" />
     <Compile Include="Interface\IFaultsView.cs" />
+    <Compile Include="Interface\IMessage.cs" />
     <Compile Include="Model\FaultsOrder.cs" />
     <Compile Include="Model\FaultsResponse.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\HTTP.cs" />
+    <Compile Include="Util\Win32API.cs" />
     <EmbeddedResource Include="Forms\ControlPanel.resx">
       <DependentUpon>ControlPanel.cs</DependentUpon>
     </EmbeddedResource>
@@ -161,6 +164,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Misc\WhatsAppAPI.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

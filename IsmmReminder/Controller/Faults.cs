@@ -15,6 +15,7 @@ namespace IsmmReminder.Controller
     {
         private IFaultsBrowserView _browserView;
         private IFaultsDataView _dataView;
+        private IMessage _messageView;
 
         private Timer _timer = null;
         private Dictionary<string, string> _cookies = null;
@@ -34,6 +35,11 @@ namespace IsmmReminder.Controller
         public void SetDataView(IFaultsDataView View)
         {
             _dataView = View;
+        }
+
+        public void SetMessageView(IMessage View)
+        {
+            _messageView = View;
         }
 
         public void StartMonitor()
