@@ -9,6 +9,10 @@ namespace IsmmReminder.Model
     public class FaultsOrder
     {
         /// <summary>
+        /// Order id
+        /// </summary>
+        public string id { set; get; }
+        /// <summary>
         /// FID
         /// </summary>
         public string fault_number { set; get; }

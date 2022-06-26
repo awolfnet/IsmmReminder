@@ -38,6 +38,7 @@ namespace IsmmReminder.Forms
             this.reloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reminderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuMain.SuspendLayout();
             this.SuspendLayout();
@@ -101,13 +102,14 @@ namespace IsmmReminder.Forms
             // reloadToolStripMenuItem
             // 
             this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
-            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(168, 34);
             this.reloadToolStripMenuItem.Text = "&Reload";
             // 
             // reminderToolStripMenuItem
             // 
             this.reminderToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.sendToolStripMenuItem});
+            this.sendToolStripMenuItem,
+            this.clearAllToolStripMenuItem});
             this.reminderToolStripMenuItem.Name = "reminderToolStripMenuItem";
             this.reminderToolStripMenuItem.Size = new System.Drawing.Size(103, 29);
             this.reminderToolStripMenuItem.Text = "&Reminder";
@@ -118,6 +120,13 @@ namespace IsmmReminder.Forms
             this.sendToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.sendToolStripMenuItem.Text = "&Send";
             this.sendToolStripMenuItem.Click += new System.EventHandler(this.sendToolStripMenuItem_Click);
+            // 
+            // clearAllToolStripMenuItem
+            // 
+            this.clearAllToolStripMenuItem.Name = "clearAllToolStripMenuItem";
+            this.clearAllToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.clearAllToolStripMenuItem.Text = "Clear All";
+            this.clearAllToolStripMenuItem.Click += new System.EventHandler(this.clearAllToolStripMenuItem_Click);
             // 
             // ControlPanel
             // 
@@ -146,5 +155,6 @@ namespace IsmmReminder.Forms
         private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reminderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sendToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearAllToolStripMenuItem;
     }
 }

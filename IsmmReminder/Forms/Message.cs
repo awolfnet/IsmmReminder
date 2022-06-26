@@ -50,6 +50,8 @@ namespace IsmmReminder.Forms
 
         private void Message_Load(object sender, EventArgs e)
         {
+            SetController(Program.Faults);
+            _faults.SetMessageView(this);
             _jsContent = ReadJSFromFile(System.AppDomain.CurrentDomain.BaseDirectory+ @"\Misc\WhatsAppAPI.js");
         }
 

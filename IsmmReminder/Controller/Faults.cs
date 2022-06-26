@@ -17,10 +17,13 @@ namespace IsmmReminder.Controller
         private IFaultsDataView _dataView;
         private IMessage _messageView;
 
-        private Timer _timer = null;
+        private Timer _timerUpdate = null;
+        private Timer _timerCheck = null;
         private Dictionary<string, string> _cookies = null;
 
         private int draw = 0;
+
+        public Queue<FaultsMessage> faultsMessages = new Queue<FaultsMessage>();
 
         public Faults()
         {
@@ -44,19 +47,44 @@ namespace IsmmReminder.Controller
 
         public void StartMonitor()
         {
-            if (_timer == null)
+            if (_timerUpdate == null)
             {
-                _timer = new Timer();
+                _timerUpdate = new Timer();
             }
 
-            _timer.Elapsed += _timer_Elapsed;
-            _timer.Interval = 60 * 1000;
-            _timer.Start();
+            _timerUpdate.Elapsed += _timerUpdate_Elapsed;
+            _timerUpdate.Interval = 60 * 1000;
+            _timerUpdate.Start();
+
+
+            if(_timerCheck == null)
+            {
+                _timerCheck = new Timer();
+            }
+
+            _timerCheck.Elapsed += _timerCheck_Elapsed;
+            _timerCheck.Interval = 60 * 1000;
+            _timerCheck.Start();
         }
 
-        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void _timerCheck_Elapsed(object sender, ElapsedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("_timer_Elapsed");
+            System.Diagnostics.Debug.WriteLine("_timerCheck_Elapsed");
+
+            if(faultsMessages.Count>0)
+            {
+                FaultsMessage message = faultsMessages.Dequeue();
+                _messageView.SendMesage("ISMM Reminder", message.Message);
+            }
+
+            int interval = new Random(Guid.NewGuid().GetHashCode()).Next(30, 60);
+            _timerCheck.Interval = interval * 1000;
+        }
+
+        private void _timerUpdate_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("_timerUpdate_Elapsed");
+            this.Fetch();
 
         }
 
@@ -96,6 +124,7 @@ namespace IsmmReminder.Controller
             {
                 FaultsOrder faultsOrder = new FaultsOrder()
                 {
+                    id= order.GetValue("id").ToString(),
                     fault_number = order.GetValue("fault_number").ToString(),
                     created_at= order.GetValue("created_at").ToString(),
                     responded_date = order.GetValue("responded_date").ToString(),
@@ -111,9 +140,9 @@ namespace IsmmReminder.Controller
 
         public void StopMonitor()
         {
-            _timer.Stop();
-            _timer.Dispose();
-            _timer = null;
+            _timerUpdate.Stop();
+            _timerUpdate.Dispose();
+            _timerUpdate = null;
         }
 
         public void SendCookie(KeyValuePair<string, string> Cookie)

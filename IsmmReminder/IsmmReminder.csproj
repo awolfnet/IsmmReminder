@@ -128,6 +128,7 @@
     <Compile Include="Interface\IMessage.cs" />
     <Compile Include="Model\FaultsOrder.cs" />
     <Compile Include="Model\FaultsResponse.cs" />
+    <Compile Include="Model\FaultsMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Extensions.cs" />

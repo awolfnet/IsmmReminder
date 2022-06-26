@@ -46,19 +46,60 @@ namespace IsmmReminder.Forms
 
         public void UpdateDatatable(List<FaultsOrder> orders)
         {
+            if (dataGridView1.InvokeRequired)
+            {
+                this.Invoke(new Action<List<FaultsOrder>, bool>(UpdateDatatable), orders, true);
+                return;
+            }
+            else
+            {
+                UpdateDatatable(orders, false);
+            }
+        }
+
+        public void UpdateDatatable(List<FaultsOrder> orders, bool IsInvoked)
+        {
             foreach (var order in orders)
             {
+                if (FindFaultNumber(order.fault_number) < 0)
+                {
+                    dataGridView1.Rows.Add(new string[] {
+                        order.fault_number,
+                        order.created_at,
+                        order.responded_date,
+                        order.site_visited_date,
+                        order.ra_acknowledged_date,
+                        order.work_started_date,
+                        order.work_completed_date
+                    });
 
-                dataGridView1.Rows.Add(new string[] {
-                    order.fault_number,
-                    order.created_at,
-                    order.responded_date,
-                    order.site_visited_date,
-                    order.ra_acknowledged_date,
-                    order.work_started_date,
-                    order.work_completed_date
-                });
+                    _faults.faultsMessages.Enqueue(new FaultsMessage()
+                    {
+                        Message = $"You have a new unclosed order: https://ismm.sg/ce/fault/{order.id}, reported at {order.created_at}."
+                    }); ;
+                }
+
+
             }
+
+        }
+
+        private int FindFaultNumber(string FaultNumber)
+        {
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+            {
+                if (dataGridView1.Rows[i].Cells["Fault Number"].Value == null)
+                {
+                    continue;
+                }
+
+                if (dataGridView1.Rows[i].Cells["Fault Number"].Value.Equals(FaultNumber))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
 
         }
 
@@ -69,8 +110,13 @@ namespace IsmmReminder.Forms
 
         private void sendToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
 
+
+        }
+
+        private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _faults.faultsMessages.Clear();
         }
     }
 }
