@@ -119,5 +119,10 @@ namespace IsmmReminder.Forms
         {
             _faults.Fetch();
         }
+
+        private void stopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _faults.StopMonitor();
+        }
     }
 }

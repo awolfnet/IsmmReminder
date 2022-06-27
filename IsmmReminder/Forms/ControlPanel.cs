@@ -31,14 +31,15 @@ namespace IsmmReminder.Forms
         {
             SetController(Program.Faults);
 
-            dataGridView1.ColumnCount = 7;
-            dataGridView1.Columns[0].Name = "Fault Number";
-            dataGridView1.Columns[1].Name = "Reported Date";
-            dataGridView1.Columns[2].Name = "Fault Acknowledged Date";
-            dataGridView1.Columns[3].Name = "Responded on Site Date";
-            dataGridView1.Columns[4].Name = "RA Conducted Date";
-            dataGridView1.Columns[5].Name = "Work Started Date";
-            dataGridView1.Columns[6].Name = "Work Completed Date";
+            dataGridView1.ColumnCount = 8;
+            dataGridView1.Columns[0].Name = "ID";
+            dataGridView1.Columns[1].Name = "Fault Number";
+            dataGridView1.Columns[2].Name = "Reported Date";
+            dataGridView1.Columns[3].Name = "Fault Acknowledged Date";
+            dataGridView1.Columns[4].Name = "Responded on Site Date";
+            dataGridView1.Columns[5].Name = "RA Conducted Date";
+            dataGridView1.Columns[6].Name = "Work Started Date";
+            dataGridView1.Columns[7].Name = "Work Completed Date";
 
 
             _faults.SetDataView(this);
@@ -64,6 +65,7 @@ namespace IsmmReminder.Forms
                 if (FindFaultNumber(order.fault_number) < 0)
                 {
                     dataGridView1.Rows.Add(new string[] {
+                        order.id,
                         order.fault_number,
                         order.created_at,
                         order.responded_date,
@@ -75,8 +77,10 @@ namespace IsmmReminder.Forms
 
                     _faults.faultsMessages.Enqueue(new FaultsMessage()
                     {
-                        Message = $"You have a new unclosed order: https://ismm.sg/ce/fault/{order.id}, reported at {order.created_at}."
-                    }); ;
+                        Message = $"You have a new order: https://ismm.sg/ce/fault/{order.id}, reported at {order.created_at}."
+                    });
+
+
                 }
 
 
@@ -117,6 +121,11 @@ namespace IsmmReminder.Forms
         private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _faults.faultsMessages.Clear();
+        }
+
+        public DataGridViewRowCollection GetDatatable()
+        {
+            return dataGridView1.Rows;
         }
     }
 }

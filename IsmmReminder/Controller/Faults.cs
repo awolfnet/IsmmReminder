@@ -8,6 +8,7 @@ using IsmmReminder.Interface;
 using System.Web;
 using IsmmReminder.Util;
 using IsmmReminder.Model;
+using System.Windows.Forms;
 
 namespace IsmmReminder.Controller
 {
@@ -17,13 +18,16 @@ namespace IsmmReminder.Controller
         private IFaultsDataView _dataView;
         private IMessage _messageView;
 
-        private Timer _timerUpdate = null;
-        private Timer _timerCheck = null;
+        private System.Timers.Timer _timerUpdate = null;
+        private System.Timers.Timer _timerCheck = null;
+        private System.Timers.Timer _timerSendMessage = null;
         private Dictionary<string, string> _cookies = null;
 
         private int draw = 0;
 
         public Queue<FaultsMessage> faultsMessages = new Queue<FaultsMessage>();
+
+        public Dictionary<string, DateTime> Notification = new Dictionary<string, DateTime>();
 
         public Faults()
         {
@@ -49,36 +53,51 @@ namespace IsmmReminder.Controller
         {
             if (_timerUpdate == null)
             {
-                _timerUpdate = new Timer();
+                _timerUpdate = new System.Timers.Timer();
             }
-
             _timerUpdate.Elapsed += _timerUpdate_Elapsed;
             _timerUpdate.Interval = 60 * 1000;
             _timerUpdate.Start();
 
 
-            if(_timerCheck == null)
+            if (_timerCheck == null)
             {
-                _timerCheck = new Timer();
+                _timerCheck = new System.Timers.Timer();
             }
-
             _timerCheck.Elapsed += _timerCheck_Elapsed;
-            _timerCheck.Interval = 60 * 1000;
+            _timerCheck.Interval = 30 * 1000;
             _timerCheck.Start();
+
+            if (_timerSendMessage == null)
+            {
+                _timerSendMessage = new System.Timers.Timer();
+            }
+            _timerSendMessage.Elapsed += _timerSendMessage_Elapsed;
+            _timerSendMessage.Interval = 60 * 1000;
+            _timerSendMessage.Start();
         }
 
-        private void _timerCheck_Elapsed(object sender, ElapsedEventArgs e)
+        private void _timerSendMessage_Elapsed(object sender, ElapsedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("_timerCheck_Elapsed");
+            System.Diagnostics.Debug.WriteLine("_timerSendMessage_Elapsed");
 
-            if(faultsMessages.Count>0)
+            if (faultsMessages.Count > 0)
             {
                 FaultsMessage message = faultsMessages.Dequeue();
                 _messageView.SendMesage("ISMM Reminder", message.Message);
             }
 
             int interval = new Random(Guid.NewGuid().GetHashCode()).Next(30, 60);
-            _timerCheck.Interval = interval * 1000;
+            _timerSendMessage.Interval = interval * 1000;
+
+            System.Diagnostics.Debug.WriteLine($"Send message interval: {interval}s, current message queue length: {faultsMessages.Count}");
+        }
+
+        private void _timerCheck_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("_timerCheck_Elapsed");
+
+            CheckOrder();
         }
 
         private void _timerUpdate_Elapsed(object sender, ElapsedEventArgs e)
@@ -86,6 +105,47 @@ namespace IsmmReminder.Controller
             System.Diagnostics.Debug.WriteLine("_timerUpdate_Elapsed");
             this.Fetch();
 
+        }
+
+        public void CheckOrder()
+        {
+            DataGridViewRowCollection dataGridViewRow = _dataView.GetDatatable();
+            for (int i = 0; i < dataGridViewRow.Count-1; i++)
+            {
+                string id = dataGridViewRow[i].Cells["ID"].Value.ToString();
+                string fid = dataGridViewRow[i].Cells["Fault Number"].Value.ToString();
+                DateTime reportedDate;
+                DateTime.TryParse(dataGridViewRow[i].Cells["Reported Date"].Value.ToString(), out reportedDate);
+
+                if(Notification.ContainsKey(id))
+                {
+                    continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(dataGridViewRow[i].Cells["Fault Acknowledged Date"].Value.ToString()))
+                {
+                    if(reportedDate.AddHours(1)<DateTime.Now)
+                    {
+                        faultsMessages.Enqueue(new FaultsMessage()
+                        {
+                            Message = $"Order need to acknowledged: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
+                        });
+                        Notification.Add(id, reportedDate);
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(dataGridViewRow[i].Cells["Work Completed Date"].Value.ToString()))
+                {
+                    if (reportedDate.AddHours(4) < DateTime.Now)
+                    {
+                        faultsMessages.Enqueue(new FaultsMessage()
+                        {
+                            Message = $"Order need to complete: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
+                        });
+                        Notification.Add(id, reportedDate);
+                    }
+                }
+            }
         }
 
         public void Fetch()
@@ -99,10 +159,10 @@ namespace IsmmReminder.Controller
 
             query.Set("draw", draw.ToString());
             query.Set("_", DateTime.UtcNow.ToUnixTimeSeconds().ToString());
-            query.Set("sd", DateTime.UtcNow.AddMonths(-1).ToString("yyyy-MM-dd"));
+            query.Set("sd", DateTime.UtcNow.AddDays(-14).ToString("yyyy-MM-dd"));
             query.Set("ed", DateTime.UtcNow.ToString("yyyy-MM-dd"));
             query.Set("start", "0");
-            query.Set("length", "482");
+            query.Set("length", "500");
 
 
             string json = http.Request($"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}?{query}");
@@ -124,9 +184,9 @@ namespace IsmmReminder.Controller
             {
                 FaultsOrder faultsOrder = new FaultsOrder()
                 {
-                    id= order.GetValue("id").ToString(),
+                    id = order.GetValue("id").ToString(),
                     fault_number = order.GetValue("fault_number").ToString(),
-                    created_at= order.GetValue("created_at").ToString(),
+                    created_at = order.GetValue("created_at").ToString(),
                     responded_date = order.GetValue("responded_date").ToString(),
                     site_visited_date = order.GetValue("site_visited_date").ToString(),
                     ra_acknowledged_date = order.GetValue("ra_acknowledged_date").ToString(),
@@ -143,6 +203,14 @@ namespace IsmmReminder.Controller
             _timerUpdate.Stop();
             _timerUpdate.Dispose();
             _timerUpdate = null;
+
+            _timerCheck.Stop();
+            _timerCheck.Dispose();
+            _timerCheck = null;
+
+            _timerSendMessage.Stop();
+            _timerSendMessage.Dispose();
+            _timerSendMessage = null;
         }
 
         public void SendCookie(KeyValuePair<string, string> Cookie)

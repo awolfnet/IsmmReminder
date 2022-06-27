@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace IsmmReminder.Interface
 {
@@ -12,6 +13,8 @@ namespace IsmmReminder.Interface
         void SetController(Controller.Faults faults);
 
         void UpdateDatatable(List<FaultsOrder> orders);
+
+        DataGridViewRowCollection GetDatatable();
 
         void Insert();
     }
