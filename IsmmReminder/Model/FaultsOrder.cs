@@ -46,5 +46,12 @@ namespace IsmmReminder.Model
         /// Work Completed Date
         /// </summary>
         public string work_completed_date { set; get; }
+
+        /// <summary>
+        /// Building
+        /// </summary>
+        public string bl { set; get; }
+
+
     }
 }

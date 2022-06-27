@@ -63,7 +63,7 @@ namespace IsmmReminder.Forms
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 33);
+            this.dataGridView1.Location = new System.Drawing.Point(0, 36);
             this.dataGridView1.Name = "dataGridView1";
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
@@ -75,7 +75,7 @@ namespace IsmmReminder.Forms
             this.dataGridView1.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridView1.RowHeadersWidth = 62;
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(1752, 975);
+            this.dataGridView1.Size = new System.Drawing.Size(1752, 972);
             this.dataGridView1.TabIndex = 0;
             // 
             // menuMain
@@ -87,7 +87,7 @@ namespace IsmmReminder.Forms
             this.reminderToolStripMenuItem});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
-            this.menuMain.Size = new System.Drawing.Size(1752, 33);
+            this.menuMain.Size = new System.Drawing.Size(1752, 36);
             this.menuMain.TabIndex = 1;
             this.menuMain.Text = "menuMain";
             // 
@@ -96,7 +96,7 @@ namespace IsmmReminder.Forms
             this.tableToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.reloadToolStripMenuItem});
             this.tableToolStripMenuItem.Name = "tableToolStripMenuItem";
-            this.tableToolStripMenuItem.Size = new System.Drawing.Size(68, 29);
+            this.tableToolStripMenuItem.Size = new System.Drawing.Size(68, 30);
             this.tableToolStripMenuItem.Text = "&Table";
             // 
             // reloadToolStripMenuItem
@@ -111,7 +111,7 @@ namespace IsmmReminder.Forms
             this.sendToolStripMenuItem,
             this.clearAllToolStripMenuItem});
             this.reminderToolStripMenuItem.Name = "reminderToolStripMenuItem";
-            this.reminderToolStripMenuItem.Size = new System.Drawing.Size(103, 29);
+            this.reminderToolStripMenuItem.Size = new System.Drawing.Size(103, 30);
             this.reminderToolStripMenuItem.Text = "&Reminder";
             // 
             // sendToolStripMenuItem

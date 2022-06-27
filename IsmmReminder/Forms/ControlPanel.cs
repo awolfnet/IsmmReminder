@@ -62,7 +62,8 @@ namespace IsmmReminder.Forms
         {
             foreach (var order in orders)
             {
-                if (FindFaultNumber(order.fault_number) < 0)
+                int rowid = FindFaultNumber(order.fault_number);
+                if (rowid < 0)
                 {
                     dataGridView1.Rows.Add(new string[] {
                         order.id,
@@ -79,8 +80,14 @@ namespace IsmmReminder.Forms
                     {
                         Message = $"You have a new order: https://ismm.sg/ce/fault/{order.id}, reported at {order.created_at}."
                     });
-
-
+                }
+                else
+                {
+                    dataGridView1.Rows[rowid].Cells["Fault Acknowledged Date"].Value = order.responded_date;
+                    dataGridView1.Rows[rowid].Cells["Responded on Site Date"].Value = order.site_visited_date;
+                    dataGridView1.Rows[rowid].Cells["RA Conducted Date"].Value = order.ra_acknowledged_date;
+                    dataGridView1.Rows[rowid].Cells["Work Started Date"].Value = order.work_started_date;
+                    dataGridView1.Rows[rowid].Cells["Work Completed Date"].Value = order.work_completed_date;
                 }
 
 

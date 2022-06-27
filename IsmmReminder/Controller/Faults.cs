@@ -128,7 +128,7 @@ namespace IsmmReminder.Controller
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
-                            Message = $"Order need to acknowledged: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
+                            Message = $"Order need to acknowledge: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
                         });
                         Notification.Add(id, reportedDate);
                     }
@@ -191,7 +191,8 @@ namespace IsmmReminder.Controller
                     site_visited_date = order.GetValue("site_visited_date").ToString(),
                     ra_acknowledged_date = order.GetValue("ra_acknowledged_date").ToString(),
                     work_started_date = order.GetValue("work_started_date").ToString(),
-                    work_completed_date = order.GetValue("work_completed_date").ToString()
+                    work_completed_date = order.GetValue("work_completed_date").ToString(),
+                    bl = order.GetValue("bl").ToString()
                 };
                 list.Add(faultsOrder);
             }
