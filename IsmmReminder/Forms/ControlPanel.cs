@@ -33,7 +33,7 @@ namespace IsmmReminder.Forms
 
             dataGridView1.ColumnCount = 8;
             dataGridView1.Columns[0].Name = "ID";
-            dataGridView1.Columns[1].Name = "Fault Number";
+            dataGridView1.Columns[1].Name = "Site Fault Number";
             dataGridView1.Columns[2].Name = "Reported Date";
             dataGridView1.Columns[3].Name = "Fault Acknowledged Date";
             dataGridView1.Columns[4].Name = "Responded on Site Date";
@@ -67,7 +67,7 @@ namespace IsmmReminder.Forms
                 {
                     dataGridView1.Rows.Add(new string[] {
                         order.id,
-                        order.fault_number,
+                        order.site_fault_number,
                         order.created_at,
                         order.responded_date,
                         order.site_visited_date,
@@ -78,7 +78,7 @@ namespace IsmmReminder.Forms
 
                     _faults.faultsMessages.Enqueue(new FaultsMessage()
                     {
-                        Message = $"You have a new order: https://ismm.sg/ce/fault/{order.id}, reported at {order.created_at}."
+                        Message = $"[!] You have a new order: https://ismm.sg/ce/fault/{order.id}, reported at {order.created_at}."
                     });
                 }
                 else
@@ -89,7 +89,6 @@ namespace IsmmReminder.Forms
                     dataGridView1.Rows[rowid].Cells["Work Started Date"].Value = order.work_started_date;
                     dataGridView1.Rows[rowid].Cells["Work Completed Date"].Value = order.work_completed_date;
                 }
-
 
             }
 

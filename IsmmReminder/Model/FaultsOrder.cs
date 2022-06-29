@@ -18,6 +18,15 @@ namespace IsmmReminder.Model
         public string fault_number { set; get; }
 
         /// <summary>
+        /// Site Fault Number
+        /// </summary>
+        public string site_fault_number { set; get; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string site_fault_id { set; get; }
+
+        /// <summary>
         /// Reported Date
         /// </summary>
         public string created_at { set; get; }

@@ -128,7 +128,7 @@ namespace IsmmReminder.Controller
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
-                            Message = $"Order need to acknowledge: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
+                            Message = $"[!!] Order need to acknowledge: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
                         });
                         Notification.Add(id, reportedDate);
                     }
@@ -140,7 +140,7 @@ namespace IsmmReminder.Controller
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
-                            Message = $"Order need to complete: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
+                            Message = $"[!!!] Order need to complete: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
                         });
                         Notification.Add(id, reportedDate);
                     }
@@ -186,6 +186,8 @@ namespace IsmmReminder.Controller
                 {
                     id = order.GetValue("id").ToString(),
                     fault_number = order.GetValue("fault_number").ToString(),
+                    site_fault_id = order.GetValue("site_fault_id").ToString(),
+                    site_fault_number = order.GetValue("site_fault_number").ToString(),
                     created_at = order.GetValue("created_at").ToString(),
                     responded_date = order.GetValue("responded_date").ToString(),
                     site_visited_date = order.GetValue("site_visited_date").ToString(),
