@@ -62,7 +62,7 @@ namespace IsmmReminder.Forms
         {
             foreach (var order in orders)
             {
-                int rowid = FindFaultNumber(order.fault_number);
+                int rowid = FindOrderID(order.id);
                 if (rowid < 0)
                 {
                     dataGridView1.Rows.Add(new string[] {
@@ -94,16 +94,16 @@ namespace IsmmReminder.Forms
 
         }
 
-        private int FindFaultNumber(string FaultNumber)
+        private int FindOrderID(string OrderID)
         {
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
-                if (dataGridView1.Rows[i].Cells["Fault Number"].Value == null)
+                if (dataGridView1.Rows[i].Cells["ID"].Value == null)
                 {
                     continue;
                 }
 
-                if (dataGridView1.Rows[i].Cells["Fault Number"].Value.Equals(FaultNumber))
+                if (dataGridView1.Rows[i].Cells["ID"].Value.Equals(OrderID))
                 {
                     return i;
                 }
@@ -120,8 +120,11 @@ namespace IsmmReminder.Forms
 
         private void sendToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-
+            if (_faults.faultsMessages.Count > 0)
+            {
+                FaultsMessage message = _faults.faultsMessages.Dequeue();
+                Program.Message.SendMesage("ISMM Reminder", message.Message);
+            }
         }
 
         private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)

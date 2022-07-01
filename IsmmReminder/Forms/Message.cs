@@ -72,7 +72,9 @@ namespace IsmmReminder.Forms
 
         public void SendMesage(string Contact, string Message)
         {
-            mainBrowser.ExecuteScriptAsync($"sendMessage('{Contact}','{Message}')");
+            mainBrowser.ExecuteScriptAsync($"setMessage('{Message}')");
+            System.Threading.Thread.Sleep(100);
+            mainBrowser.ExecuteScriptAsync($"sendMessage()");
         }
 
         public void SetController(Faults faults)

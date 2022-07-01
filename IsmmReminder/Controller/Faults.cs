@@ -27,7 +27,8 @@ namespace IsmmReminder.Controller
 
         public Queue<FaultsMessage> faultsMessages = new Queue<FaultsMessage>();
 
-        public Dictionary<string, DateTime> Notification = new Dictionary<string, DateTime>();
+        public Dictionary<string, DateTime> AcknowledgeNotification = new Dictionary<string, DateTime>();
+        public Dictionary<string, DateTime> CompleteNotification = new Dictionary<string, DateTime>();
 
         public Faults()
         {
@@ -113,36 +114,42 @@ namespace IsmmReminder.Controller
             for (int i = 0; i < dataGridViewRow.Count-1; i++)
             {
                 string id = dataGridViewRow[i].Cells["ID"].Value.ToString();
-                string fid = dataGridViewRow[i].Cells["Fault Number"].Value.ToString();
+                string fid = dataGridViewRow[i].Cells["Site Fault Number"].Value.ToString();
                 DateTime reportedDate;
                 DateTime.TryParse(dataGridViewRow[i].Cells["Reported Date"].Value.ToString(), out reportedDate);
 
-                if(Notification.ContainsKey(id))
-                {
-                    continue;
-                }
 
                 if (string.IsNullOrWhiteSpace(dataGridViewRow[i].Cells["Fault Acknowledged Date"].Value.ToString()))
                 {
-                    if(reportedDate.AddHours(1)<DateTime.Now)
+                    if (AcknowledgeNotification.ContainsKey(id))
+                    {
+                        continue;
+                    }
+
+                    if (reportedDate.AddHours(1)<DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
                             Message = $"[!!] Order need to acknowledge: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
                         });
-                        Notification.Add(id, reportedDate);
+                        AcknowledgeNotification.Add(id, reportedDate);
                     }
                 }
 
                 if (string.IsNullOrWhiteSpace(dataGridViewRow[i].Cells["Work Completed Date"].Value.ToString()))
                 {
+                    if(CompleteNotification.ContainsKey(id))
+                    {
+                        continue;
+                    }
+
                     if (reportedDate.AddHours(4) < DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
                             Message = $"[!!!] Order need to complete: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
                         });
-                        Notification.Add(id, reportedDate);
+                        CompleteNotification.Add(id, reportedDate);
                     }
                 }
             }
