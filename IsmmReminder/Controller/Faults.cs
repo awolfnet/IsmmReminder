@@ -111,7 +111,7 @@ namespace IsmmReminder.Controller
         public void CheckOrder()
         {
             DataGridViewRowCollection dataGridViewRow = _dataView.GetDatatable();
-            for (int i = 0; i < dataGridViewRow.Count-1; i++)
+            for (int i = 0; i < dataGridViewRow.Count - 1; i++)
             {
                 string id = dataGridViewRow[i].Cells["ID"].Value.ToString();
                 string fid = dataGridViewRow[i].Cells["Site Fault Number"].Value.ToString();
@@ -126,7 +126,7 @@ namespace IsmmReminder.Controller
                         continue;
                     }
 
-                    if (reportedDate.AddHours(1)<DateTime.Now)
+                    if (reportedDate.AddHours(1) < DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
@@ -138,7 +138,7 @@ namespace IsmmReminder.Controller
 
                 if (string.IsNullOrWhiteSpace(dataGridViewRow[i].Cells["Work Completed Date"].Value.ToString()))
                 {
-                    if(CompleteNotification.ContainsKey(id))
+                    if (CompleteNotification.ContainsKey(id))
                     {
                         continue;
                     }
@@ -173,10 +173,12 @@ namespace IsmmReminder.Controller
 
 
             string json = http.Request($"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}?{query}");
+            if (!string.IsNullOrWhiteSpace(json))
+            {
+                var o = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                UpdateDatatable((Newtonsoft.Json.Linq.JObject)o);
+            }
 
-            var o = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-
-            UpdateDatatable((Newtonsoft.Json.Linq.JObject)o);
         }
 
         public void UpdateDatatable(Newtonsoft.Json.Linq.JObject jobject)
