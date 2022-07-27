@@ -124,5 +124,10 @@ namespace IsmmReminder.Forms
         {
             _faults.StopMonitor();
         }
+
+        public void RefreshPage()
+        {
+            mainBrowser.Reload();
+        }
     }
 }

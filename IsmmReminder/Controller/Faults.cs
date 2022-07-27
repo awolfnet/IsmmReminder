@@ -104,6 +104,12 @@ namespace IsmmReminder.Controller
         private void _timerUpdate_Elapsed(object sender, ElapsedEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("_timerUpdate_Elapsed");
+            if (draw >= 60)
+            {
+                _browserView.RefreshPage();
+                draw = 0;
+
+            }
             this.Fetch();
 
         }
@@ -153,6 +159,8 @@ namespace IsmmReminder.Controller
                     }
                 }
             }
+
+            System.Diagnostics.Debug.WriteLine($"Faults messages queue length: {faultsMessages.Count}");
         }
 
         public void Fetch()
@@ -166,19 +174,27 @@ namespace IsmmReminder.Controller
 
             query.Set("draw", draw.ToString());
             query.Set("_", DateTime.UtcNow.ToUnixTimeSeconds().ToString());
-            query.Set("sd", DateTime.UtcNow.AddDays(-14).ToString("yyyy-MM-dd"));
+            query.Set("sd", DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-dd"));
             query.Set("ed", DateTime.UtcNow.ToString("yyyy-MM-dd"));
             query.Set("start", "0");
             query.Set("length", "500");
 
 
             string json = http.Request($"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}?{query}");
-            if (!string.IsNullOrWhiteSpace(json))
+            try
             {
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    throw new Exception("Empty response");
+                }
+
                 var o = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
                 UpdateDatatable((Newtonsoft.Json.Linq.JObject)o);
             }
-
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
         }
 
         public void UpdateDatatable(Newtonsoft.Json.Linq.JObject jobject)

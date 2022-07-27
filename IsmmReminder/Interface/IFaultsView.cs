@@ -10,6 +10,7 @@ namespace IsmmReminder.Interface
     {
         void SetController(Controller.Faults faults);
         Dictionary<string, string> GetCookie();
-        
+
+        void RefreshPage();
     }
 }
