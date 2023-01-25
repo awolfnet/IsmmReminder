@@ -31,6 +31,21 @@ namespace IsmmReminder.Controller
         public Dictionary<string, DateTime> AcknowledgeNotification = new Dictionary<string, DateTime>();
         public Dictionary<string, DateTime> CompleteNotification = new Dictionary<string, DateTime>();
 
+        public string Status
+        {
+            get
+            {
+                return $"Fetching thread:\t{(_timerUpdate?.Enabled == true ? "Running" : "Stopped")}\r\n" +
+                       $"Checking thread:\t{(_timerCheck?.Enabled == true ? "Running" : "Stopped")}\r\n" +
+                       $"Messaging thread:\t{(_timerSendMessage?.Enabled == true ? "Running" : "Stopped")}\r\n" +
+                       $"Message queue length:\t{faultsMessages?.Count}\r\n" +
+                       $"Minutes to acknowledge:\t{ConfigurationManager.AppSettings["MinutesToAcknowledge"]}\r\n" +
+                       $"Minutes to complete:\t{ConfigurationManager.AppSettings["MinutesToComplete"]}\r\n" +
+                       $"Days to fetch:\t{ConfigurationManager.AppSettings["DaysToFetch"]}\r\n" +
+                       $"Report on every:\t{ConfigurationManager.AppSettings["ReportDay"]}";
+            }
+        }
+
         public Faults()
         {
             _cookies = new Dictionary<string, string>();
@@ -139,7 +154,7 @@ namespace IsmmReminder.Controller
                         continue;
                     }
 
-                    if (reportedDate.AddHours(1) < DateTime.Now)
+                    if (reportedDate.AddHours(MinutesToAcknowledge) < DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
@@ -156,7 +171,7 @@ namespace IsmmReminder.Controller
                         continue;
                     }
 
-                    if (reportedDate.AddHours(4) < DateTime.Now)
+                    if (reportedDate.AddHours(MinutesToComplete) < DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
@@ -174,6 +189,9 @@ namespace IsmmReminder.Controller
         {
             draw++;
 
+            int DaysOffset = -14;
+            int.TryParse(ConfigurationManager.AppSettings["DaysToFetch"], out DaysOffset);
+
             HTTP http = new HTTP();
             http.Cookies = _cookies;
             Uri uri = new Uri(@"https://ismm.sg/ce/datatable/faults?draw=2&columns%5B0%5D%5Bdata%5D=action&columns%5B0%5D%5Borderable%5D=false&columns%5B1%5D%5Bdata%5D=f_num&columns%5B2%5D%5Bdata%5D=trd&columns%5B3%5D%5Bdata%5D=type&columns%5B4%5D%5Bdata%5D=cat&columns%5B5%5D%5Bdata%5D=sev&columns%5B6%5D%5Bdata%5D=st&columns%5B7%5D%5Bdata%5D=bl&columns%5B8%5D%5Bdata%5D=fl&columns%5B9%5D%5Bdata%5D=rm&columns%5B10%5D%5Bdata%5D=cff&columns%5B11%5D%5Bdata%5D=ca&columns%5B12%5D%5Bdata%5D=resd&columns%5B13%5D%5Bdata%5D=svd&columns%5B14%5D%5Bdata%5D=rad&columns%5B15%5D%5Bdata%5D=wsd&columns%5B16%5D%5Bdata%5D=wcd&columns%5B17%5D%5Bdata%5D=wcun&columns%5B18%5D%5Bdata%5D=act_dot&columns%5B19%5D%5Bdata%5D=act_taken&columns%5B19%5D%5Bsearchable%5D=false&columns%5B20%5D%5Bdata%5D=otrd&columns%5B21%5D%5Bdata%5D=cosd&columns%5B22%5D%5Bdata%5D=ard&columns%5B23%5D%5Bdata%5D=f_num_ref&columns%5B24%5D%5Bdata%5D=eun&columns%5B25%5D%5Bdata%5D=rank&columns%5B26%5D%5Bdata%5D=euc&columns%5B27%5D%5Bdata%5D=sr&columns%5B28%5D%5Bdata%5D=cu&columns%5B29%5D%5Bdata%5D=rmk&order%5B0%5D%5Bcolumn%5D=1&order%5B0%5D%5Bdir%5D=desc&start=10&length=10&search%5Bvalue%5D=&stat=&ls%5B%5D=60&ls%5B%5D=59&ls%5B%5D=58&ls%5B%5D=83&ls%5B%5D=79&ls%5B%5D=81&lb=&lf=&sd=2022-03-03&ed=2022-05-31&cat=&tp=&cc_stat=&resp_t=&pub=&inca=&inty=&_=1653995731017");
@@ -181,7 +199,7 @@ namespace IsmmReminder.Controller
 
             query.Set("draw", draw.ToString());
             query.Set("_", DateTime.UtcNow.ToUnixTimeSeconds().ToString());
-            query.Set("sd", DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-dd"));
+            query.Set("sd", DateTime.UtcNow.AddDays(DaysOffset).ToString("yyyy-MM-dd"));
             query.Set("ed", DateTime.UtcNow.ToString("yyyy-MM-dd"));
             query.Set("start", "0");
             query.Set("length", "500");
@@ -230,7 +248,7 @@ namespace IsmmReminder.Controller
                 };
                 list.Add(faultsOrder);
             }
-            _dataView.UpdateDatatable(list);
+            _dataView?.UpdateDatatable(list);
         }
 
         public void StopMonitor()

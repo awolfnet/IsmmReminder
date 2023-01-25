@@ -40,6 +40,7 @@ namespace IsmmReminder.Forms
             this.menuStart = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFetch = new System.Windows.Forms.ToolStripMenuItem();
             this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,6 +56,7 @@ namespace IsmmReminder.Forms
             this.menuStrip1.Size = new System.Drawing.Size(1308, 33);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
             // 
             // menuBrowser
             // 
@@ -69,21 +71,21 @@ namespace IsmmReminder.Forms
             // menuReload
             // 
             this.menuReload.Name = "menuReload";
-            this.menuReload.Size = new System.Drawing.Size(270, 34);
+            this.menuReload.Size = new System.Drawing.Size(168, 34);
             this.menuReload.Text = "&Reload";
             this.menuReload.Click += new System.EventHandler(this.menuReload_Click);
             // 
             // menuHome
             // 
             this.menuHome.Name = "menuHome";
-            this.menuHome.Size = new System.Drawing.Size(270, 34);
+            this.menuHome.Size = new System.Drawing.Size(168, 34);
             this.menuHome.Text = "&Home";
             this.menuHome.Click += new System.EventHandler(this.menuHome_Click);
             // 
             // menuDebug
             // 
             this.menuDebug.Name = "menuDebug";
-            this.menuDebug.Size = new System.Drawing.Size(270, 34);
+            this.menuDebug.Size = new System.Drawing.Size(168, 34);
             this.menuDebug.Text = "&Debug";
             this.menuDebug.Click += new System.EventHandler(this.menuDebug_Click);
             // 
@@ -94,10 +96,12 @@ namespace IsmmReminder.Forms
             this.menuMessage,
             this.menuStart,
             this.menuFetch,
-            this.stopToolStripMenuItem});
+            this.stopToolStripMenuItem,
+            this.statusToolStripMenuItem});
             this.menuControlPanel.Name = "menuControlPanel";
             this.menuControlPanel.Size = new System.Drawing.Size(133, 29);
             this.menuControlPanel.Text = "&Control Panel";
+            this.menuControlPanel.Click += new System.EventHandler(this.menuControlPanel_Click);
             // 
             // menuShowControlPanel
             // 
@@ -134,6 +138,13 @@ namespace IsmmReminder.Forms
             this.stopToolStripMenuItem.Text = "Sto&p";
             this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
             // 
+            // statusToolStripMenuItem
+            // 
+            this.statusToolStripMenuItem.Name = "statusToolStripMenuItem";
+            this.statusToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.statusToolStripMenuItem.Text = "S&tatus";
+            this.statusToolStripMenuItem.Click += new System.EventHandler(this.statusToolStripMenuItem_Click);
+            // 
             // Browser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -164,6 +175,7 @@ namespace IsmmReminder.Forms
         private System.Windows.Forms.ToolStripMenuItem menuDebug;
         private System.Windows.Forms.ToolStripMenuItem menuFetch;
         private System.Windows.Forms.ToolStripMenuItem stopToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem statusToolStripMenuItem;
     }
 }
 

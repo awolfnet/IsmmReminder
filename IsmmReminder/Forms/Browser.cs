@@ -129,5 +129,20 @@ namespace IsmmReminder.Forms
         {
             mainBrowser.Reload();
         }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void menuControlPanel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void statusToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(_faults.Status, "ISMM Reminder", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 }

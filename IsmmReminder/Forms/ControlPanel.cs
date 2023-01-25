@@ -136,5 +136,10 @@ namespace IsmmReminder.Forms
         {
             return dataGridView1.Rows;
         }
+
+        private void statusToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(_faults.Status, "ISMM Reminder", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 }
