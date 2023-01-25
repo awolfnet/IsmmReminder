@@ -9,6 +9,7 @@ using System.Web;
 using IsmmReminder.Util;
 using IsmmReminder.Model;
 using System.Windows.Forms;
+using System.Configuration;
 
 namespace IsmmReminder.Controller
 {
@@ -109,26 +110,32 @@ namespace IsmmReminder.Controller
 
         public void CheckOrder()
         {
+            int MinutesToAcknowledge = 60;
+            int.TryParse(ConfigurationManager.AppSettings["MinutesToAcknowledge"], out MinutesToAcknowledge);
+
+            int MinutesToComplete = 240;
+            int.TryParse(ConfigurationManager.AppSettings["MinutesToComplete"], out MinutesToComplete);
+
             DataGridViewRowCollection dataGridViewRow = _dataView.GetDatatable();
-            for (int i = 0; i < dataGridViewRow.Count-1; i++)
+            for (int i = 0; i < dataGridViewRow.Count - 1; i++)
             {
                 string id = dataGridViewRow[i].Cells["ID"].Value.ToString();
                 string fid = dataGridViewRow[i].Cells["Fault Number"].Value.ToString();
                 DateTime reportedDate;
                 DateTime.TryParse(dataGridViewRow[i].Cells["Reported Date"].Value.ToString(), out reportedDate);
 
-                if(Notification.ContainsKey(id))
+                if (Notification.ContainsKey(id))
                 {
                     continue;
                 }
 
                 if (string.IsNullOrWhiteSpace(dataGridViewRow[i].Cells["Fault Acknowledged Date"].Value.ToString()))
                 {
-                    if(reportedDate.AddHours(1)<DateTime.Now)
+                    if (reportedDate.AddMinutes(MinutesToAcknowledge) < DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
-                            Message = $"Order need to acknowledge: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
+                            Message = $"[!!] Order need to acknowledge: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
                         });
                         Notification.Add(id, reportedDate);
                     }
@@ -136,11 +143,11 @@ namespace IsmmReminder.Controller
 
                 if (string.IsNullOrWhiteSpace(dataGridViewRow[i].Cells["Work Completed Date"].Value.ToString()))
                 {
-                    if (reportedDate.AddHours(4) < DateTime.Now)
+                    if (reportedDate.AddMinutes(MinutesToComplete) < DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
-                            Message = $"Order need to complete: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
+                            Message = $"[!!!] Order need to complete: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
                         });
                         Notification.Add(id, reportedDate);
                     }

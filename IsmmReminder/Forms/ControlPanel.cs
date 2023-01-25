@@ -78,7 +78,7 @@ namespace IsmmReminder.Forms
 
                     _faults.faultsMessages.Enqueue(new FaultsMessage()
                     {
-                        Message = $"You have a new order: https://ismm.sg/ce/fault/{order.id}, reported at {order.created_at}."
+                        Message = $"[!] You have a new order: https://ismm.sg/ce/fault/{order.id}, reported at {order.created_at}."
                     });
                 }
                 else
