@@ -33,13 +33,19 @@ namespace IsmmReminder.Util
                 request.CookieContainer = cookieContainer;
             }
 
-
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+            try
             {
-                html = reader.ReadToEnd();
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    html = reader.ReadToEnd();
+                }
+            }catch(Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
             }
+
 
             return html;
         }

@@ -33,7 +33,7 @@ namespace IsmmReminder.Forms
 
             dataGridView1.ColumnCount = 8;
             dataGridView1.Columns[0].Name = "ID";
-            dataGridView1.Columns[1].Name = "Fault Number";
+            dataGridView1.Columns[1].Name = "Site Fault Number";
             dataGridView1.Columns[2].Name = "Reported Date";
             dataGridView1.Columns[3].Name = "Fault Acknowledged Date";
             dataGridView1.Columns[4].Name = "Responded on Site Date";
@@ -62,12 +62,12 @@ namespace IsmmReminder.Forms
         {
             foreach (var order in orders)
             {
-                int rowid = FindFaultNumber(order.fault_number);
+                int rowid = FindOrderID(order.id);
                 if (rowid < 0)
                 {
                     dataGridView1.Rows.Add(new string[] {
                         order.id,
-                        order.fault_number,
+                        order.site_fault_number,
                         order.created_at,
                         order.responded_date,
                         order.site_visited_date,
@@ -90,21 +90,20 @@ namespace IsmmReminder.Forms
                     dataGridView1.Rows[rowid].Cells["Work Completed Date"].Value = order.work_completed_date;
                 }
 
-
             }
 
         }
 
-        private int FindFaultNumber(string FaultNumber)
+        private int FindOrderID(string OrderID)
         {
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
-                if (dataGridView1.Rows[i].Cells["Fault Number"].Value == null)
+                if (dataGridView1.Rows[i].Cells["ID"].Value == null)
                 {
                     continue;
                 }
 
-                if (dataGridView1.Rows[i].Cells["Fault Number"].Value.Equals(FaultNumber))
+                if (dataGridView1.Rows[i].Cells["ID"].Value.Equals(OrderID))
                 {
                     return i;
                 }
@@ -121,8 +120,11 @@ namespace IsmmReminder.Forms
 
         private void sendToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-
+            if (_faults.faultsMessages.Count > 0)
+            {
+                FaultsMessage message = _faults.faultsMessages.Dequeue();
+                Program.Message.SendMesage("ISMM Reminder", message.Message);
+            }
         }
 
         private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)

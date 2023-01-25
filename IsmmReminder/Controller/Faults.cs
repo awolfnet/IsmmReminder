@@ -28,7 +28,8 @@ namespace IsmmReminder.Controller
 
         public Queue<FaultsMessage> faultsMessages = new Queue<FaultsMessage>();
 
-        public Dictionary<string, DateTime> Notification = new Dictionary<string, DateTime>();
+        public Dictionary<string, DateTime> AcknowledgeNotification = new Dictionary<string, DateTime>();
+        public Dictionary<string, DateTime> CompleteNotification = new Dictionary<string, DateTime>();
 
         public Faults()
         {
@@ -104,6 +105,12 @@ namespace IsmmReminder.Controller
         private void _timerUpdate_Elapsed(object sender, ElapsedEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("_timerUpdate_Elapsed");
+            if (draw >= 60)
+            {
+                _browserView.RefreshPage();
+                draw = 0;
+
+            }
             this.Fetch();
 
         }
@@ -120,39 +127,47 @@ namespace IsmmReminder.Controller
             for (int i = 0; i < dataGridViewRow.Count - 1; i++)
             {
                 string id = dataGridViewRow[i].Cells["ID"].Value.ToString();
-                string fid = dataGridViewRow[i].Cells["Fault Number"].Value.ToString();
+                string fid = dataGridViewRow[i].Cells["Site Fault Number"].Value.ToString();
                 DateTime reportedDate;
                 DateTime.TryParse(dataGridViewRow[i].Cells["Reported Date"].Value.ToString(), out reportedDate);
 
-                if (Notification.ContainsKey(id))
-                {
-                    continue;
-                }
 
                 if (string.IsNullOrWhiteSpace(dataGridViewRow[i].Cells["Fault Acknowledged Date"].Value.ToString()))
                 {
-                    if (reportedDate.AddMinutes(MinutesToAcknowledge) < DateTime.Now)
+                    if (AcknowledgeNotification.ContainsKey(id))
+                    {
+                        continue;
+                    }
+
+                    if (reportedDate.AddHours(1) < DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
                             Message = $"[!!] Order need to acknowledge: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
                         });
-                        Notification.Add(id, reportedDate);
+                        AcknowledgeNotification.Add(id, reportedDate);
                     }
                 }
 
                 if (string.IsNullOrWhiteSpace(dataGridViewRow[i].Cells["Work Completed Date"].Value.ToString()))
                 {
-                    if (reportedDate.AddMinutes(MinutesToComplete) < DateTime.Now)
+                    if (CompleteNotification.ContainsKey(id))
+                    {
+                        continue;
+                    }
+
+                    if (reportedDate.AddHours(4) < DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
                             Message = $"[!!!] Order need to complete: https://ismm.sg/ce/fault/{id}, reported at {reportedDate}."
                         });
-                        Notification.Add(id, reportedDate);
+                        CompleteNotification.Add(id, reportedDate);
                     }
                 }
             }
+
+            System.Diagnostics.Debug.WriteLine($"Faults messages queue length: {faultsMessages.Count}");
         }
 
         public void Fetch()
@@ -166,17 +181,27 @@ namespace IsmmReminder.Controller
 
             query.Set("draw", draw.ToString());
             query.Set("_", DateTime.UtcNow.ToUnixTimeSeconds().ToString());
-            query.Set("sd", DateTime.UtcNow.AddDays(-14).ToString("yyyy-MM-dd"));
+            query.Set("sd", DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-dd"));
             query.Set("ed", DateTime.UtcNow.ToString("yyyy-MM-dd"));
             query.Set("start", "0");
             query.Set("length", "500");
 
 
             string json = http.Request($"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}?{query}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    throw new Exception("Empty response");
+                }
 
-            var o = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-
-            UpdateDatatable((Newtonsoft.Json.Linq.JObject)o);
+                var o = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                UpdateDatatable((Newtonsoft.Json.Linq.JObject)o);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
         }
 
         public void UpdateDatatable(Newtonsoft.Json.Linq.JObject jobject)
@@ -193,6 +218,8 @@ namespace IsmmReminder.Controller
                 {
                     id = order.GetValue("id").ToString(),
                     fault_number = order.GetValue("fault_number").ToString(),
+                    site_fault_id = order.GetValue("site_fault_id").ToString(),
+                    site_fault_number = order.GetValue("site_fault_number").ToString(),
                     created_at = order.GetValue("created_at").ToString(),
                     responded_date = order.GetValue("responded_date").ToString(),
                     site_visited_date = order.GetValue("site_visited_date").ToString(),
