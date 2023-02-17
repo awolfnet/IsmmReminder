@@ -30,6 +30,7 @@ namespace IsmmReminder.Controller
 
         public Dictionary<string, DateTime> AcknowledgeNotification = new Dictionary<string, DateTime>();
         public Dictionary<string, DateTime> CompleteNotification = new Dictionary<string, DateTime>();
+        public Dictionary<string, DateTime> ReportNotification = new Dictionary<string, DateTime>();
 
         public string Status
         {
@@ -42,7 +43,10 @@ namespace IsmmReminder.Controller
                        $"Minutes to acknowledge:\t{ConfigurationManager.AppSettings["MinutesToAcknowledge"]}\r\n" +
                        $"Minutes to complete:\t{ConfigurationManager.AppSettings["MinutesToComplete"]}\r\n" +
                        $"Days to fetch:\t{ConfigurationManager.AppSettings["DaysToFetch"]}\r\n" +
-                       $"Report on every:\t{ConfigurationManager.AppSettings["ReportDay"]}";
+                       $"Report on every:\t{ConfigurationManager.AppSettings["ReportDay"]}\r\n" +
+                       $"Report time:\t{ConfigurationManager.AppSettings["ReportTime"]}\r\n" +
+                       $"Days to report:\t{ConfigurationManager.AppSettings["DaysToReport"]}\r\n";
+
             }
         }
 
@@ -113,8 +117,8 @@ namespace IsmmReminder.Controller
         private void _timerCheck_Elapsed(object sender, ElapsedEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("_timerCheck_Elapsed");
-
             CheckOrder();
+            CheckReportDay();
         }
 
         private void _timerUpdate_Elapsed(object sender, ElapsedEventArgs e)
@@ -127,6 +131,103 @@ namespace IsmmReminder.Controller
 
             }
             this.Fetch();
+        }
+
+        public void Report()
+        {
+            System.Diagnostics.Debug.WriteLine("Report");
+            int DaysOffset = -7;
+            int.TryParse(ConfigurationManager.AppSettings["DaysToReport"], out DaysOffset);
+
+            StringBuilder sb = new StringBuilder();
+            List<string> outstandingOrders = new List<string>();
+            List<string> completedOrders = new List<string>();
+            List<string> acknowledgedOrders = new List<string>();
+
+            DataGridViewRowCollection dataGridViewRow = _dataView.GetDatatable();
+
+            for (int i = 0; i < dataGridViewRow.Count - 1; i++)
+            {
+                string id = dataGridViewRow[i].Cells["ID"].Value.ToString();
+                string fid = dataGridViewRow[i].Cells["Site Fault Number"].Value.ToString();
+                DateTime reportedDate;
+                DateTime.TryParse(dataGridViewRow[i].Cells["Reported Date"].Value.ToString(), out reportedDate);
+
+                if (reportedDate > DateTime.Now.AddDays(DaysOffset))
+                {
+                    if (string.IsNullOrWhiteSpace(dataGridViewRow[i].Cells["Work Completed Date"].Value.ToString()))
+                    {
+                        outstandingOrders.Add($"https://ismm.sg/ce/fault/{id}");
+                    }
+                    else
+                    {
+                        completedOrders.Add($"https://ismm.sg/ce/fault/{id}");
+                    }
+                }
+            }
+
+            sb.Append($"Total {completedOrders.Count} orders are completed and {outstandingOrders.Count} orders are outstanding since the past {Math.Abs(DaysOffset)} days from {DateTime.Now}.");
+
+            string message = sb.ToString();
+
+            faultsMessages.Enqueue(new FaultsMessage()
+            {
+                Message = message
+            });
+
+            sb.Clear();
+
+            sb.Append("Outstanding orders: ");
+
+            foreach (string orderLink in outstandingOrders)
+            {
+                sb.Append($"Fault: {orderLink} ====== ");
+            }
+
+            message = sb.ToString();
+
+            faultsMessages.Enqueue(new FaultsMessage()
+            {
+                Message = message
+            });
+
+            string reportID = DateTime.Now.ToString("ddMMyyyy");
+            ReportNotification.Add(reportID, DateTime.Now);
+            System.Diagnostics.Debug.WriteLine($"ReportID:{reportID}");
+        }
+
+        public void CheckReportDay()
+        {
+            string ReportDay = ConfigurationManager.AppSettings["ReportDay"];
+            if (string.IsNullOrWhiteSpace(ReportDay))    //Report day is empty, no report.
+            {
+                return;
+            }
+
+            string reportID = DateTime.Now.ToString("ddMMyyyy");
+            if (ReportNotification.ContainsKey(reportID))    //Reported today, skip.
+            {
+                return;
+            }
+
+            var dateFormat = new System.Globalization.DateTimeFormatInfo();
+            dateFormat.AbbreviatedDayNames = new string[] { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
+            string Today = DateTime.Now.ToString("ddd", dateFormat);
+
+            if (!Today.Equals(ReportDay.ToLower()))  //Not report day.
+            {
+                return;
+            }
+
+            TimeSpan ReportTime;
+            TimeSpan.TryParse(ConfigurationManager.AppSettings["ReportTime"], out ReportTime);
+
+            TimeSpan Now = new TimeSpan(DateTime.Now.TimeOfDay.Hours, DateTime.Now.TimeOfDay.Minutes, 0);
+
+            if (ReportTime.Equals(Now))
+            {
+                Report();
+            }
 
         }
 

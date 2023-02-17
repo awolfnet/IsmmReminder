@@ -141,5 +141,10 @@ namespace IsmmReminder.Forms
         {
             MessageBox.Show(_faults.Status, "ISMM Reminder", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        private void reportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _faults.Report();
+        }
     }
 }
