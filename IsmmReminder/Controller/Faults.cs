@@ -255,7 +255,7 @@ namespace IsmmReminder.Controller
                         continue;
                     }
 
-                    if (reportedDate.AddHours(MinutesToAcknowledge) < DateTime.Now)
+                    if (reportedDate.AddMinutes(MinutesToAcknowledge) < DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
@@ -272,7 +272,7 @@ namespace IsmmReminder.Controller
                         continue;
                     }
 
-                    if (reportedDate.AddHours(MinutesToComplete) < DateTime.Now)
+                    if (reportedDate.AddMinutes(MinutesToComplete) < DateTime.Now)
                     {
                         faultsMessages.Enqueue(new FaultsMessage()
                         {
